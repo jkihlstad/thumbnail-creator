@@ -73,6 +73,21 @@
     color: hsl(var(--foreground));
   }
 
+  /* Pointer cursor for all clickable elements */
+  button,
+  a,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  input[type="checkbox"],
+  input[type="radio"],
+  select,
+  label[for],
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
   /* Custom scrollbar styles */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
