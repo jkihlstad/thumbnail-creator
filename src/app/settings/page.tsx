@@ -160,8 +160,15 @@ export default function SettingsPage() {
   const fetchUsageStats = async () => {
     try {
       const response = await fetch('/api/usage');
+      if (!response.ok) {
+        // If unauthorized or error, use default free tier values
+        console.error('Usage API error:', response.status);
+        return;
+      }
       const data = await response.json();
-      setUsage(data);
+      if (data && !data.error) {
+        setUsage(data);
+      }
     } catch (error) {
       console.error('Failed to fetch usage stats:', error);
     } finally {
@@ -196,9 +203,9 @@ export default function SettingsPage() {
     pro: { name: 'Pro', color: 'text-yellow-400', generations: 300, downloads: 300 },
   };
 
-  const currentTierInfo = tierInfo[usage.currentTier];
-  const generationsPercentage = (usage.generationsUsed / usage.generationsLimit) * 100;
-  const downloadsPercentage = (usage.downloadsUsed / usage.downloadsLimit) * 100;
+  const currentTierInfo = tierInfo[usage.currentTier] || tierInfo.free;
+  const generationsPercentage = usage.generationsLimit > 0 ? (usage.generationsUsed / usage.generationsLimit) * 100 : 0;
+  const downloadsPercentage = usage.downloadsLimit > 0 ? (usage.downloadsUsed / usage.downloadsLimit) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
