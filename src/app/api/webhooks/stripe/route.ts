@@ -170,8 +170,9 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
+        const invoiceData = invoice as any;
 
-        if (invoice.subscription) {
+        if (invoiceData.subscription) {
           const updatePayload = {
             stripeCustomerId: invoice.customer as string,
             subscriptionStatus: 'past_due' as const,
