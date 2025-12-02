@@ -85,9 +85,10 @@ export async function POST(request: NextRequest) {
 
         if (session.mode === 'subscription' && session.subscription) {
           // Get the subscription details
-          const subscription = await stripe.subscriptions.retrieve(
+          const subscriptionResponse = await stripe.subscriptions.retrieve(
             session.subscription as string
           );
+          const subscription = subscriptionResponse as unknown as Stripe.Subscription;
 
           const priceId = subscription.items.data[0]?.price.id;
           const tier = getTierFromPriceId(priceId);
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
             subscriptionTier: tier,
             subscriptionStatus: subscription.status as 'active' | 'canceled' | 'past_due' | 'trialing',
             billingCycle,
-            currentPeriodEnd: subscription.current_period_end * 1000,
+            currentPeriodEnd: (subscription as any).current_period_end * 1000,
           };
 
           // Call Convex HTTP endpoint to update subscription
@@ -133,7 +134,7 @@ export async function POST(request: NextRequest) {
           subscriptionTier: tier,
           subscriptionStatus: subscription.status as 'active' | 'canceled' | 'past_due' | 'trialing',
           billingCycle,
-          currentPeriodEnd: subscription.current_period_end * 1000,
+          currentPeriodEnd: (subscription as any).current_period_end * 1000,
         };
 
         const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL!.replace('.cloud', '.site');
