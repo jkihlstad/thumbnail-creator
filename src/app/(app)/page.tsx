@@ -3,7 +3,7 @@
 import { useAction, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useState } from "react";
-import { SignedIn, UserButton, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import {
   Download,
   Loader2,
@@ -130,7 +130,7 @@ export default function AppPage() {
                 className="flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors"
               >
                 <History className="w-4 h-4" />
-                History
+                Library
               </button>
               <button className="text-slate-400 hover:text-white transition-colors">
                 <Settings className="w-5 h-5" />
@@ -138,6 +138,13 @@ export default function AppPage() {
               <SignedIn>
                 <UserButton />
               </SignedIn>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium text-sm transition-colors">
+                    Sign In
+                  </button>
+                </SignInButton>
+              </SignedOut>
             </div>
 
             {/* Mobile Menu Toggle */}
@@ -160,8 +167,15 @@ export default function AppPage() {
               className="flex items-center gap-3 w-full p-2 rounded-lg text-slate-400"
             >
               <History className="w-5 h-5" />
-              History
+              Library
             </button>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="flex items-center gap-3 w-full p-2 rounded-lg bg-indigo-600 text-white">
+                  Sign In to Generate
+                </button>
+              </SignInButton>
+            </SignedOut>
           </div>
         )}
       </nav>
@@ -242,10 +256,10 @@ export default function AppPage() {
             </div>
           </div>
 
-          {/* History Sidebar */}
+          {/* Library Sidebar */}
           {showHistory && thumbnails && (
             <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-800">
-              <h3 className="text-sm font-semibold text-slate-300 mb-3">Recent Thumbnails</h3>
+              <h3 className="text-sm font-semibold text-slate-300 mb-3">Your Library</h3>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {thumbnails.length > 0 ? (
                   thumbnails.map((thumbnail) => (
@@ -343,34 +357,54 @@ export default function AppPage() {
 
           {/* Desktop Generate Button (Floating) */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block">
-            <button
-              onClick={handleGenerate}
-              disabled={!prompt.trim() || isLoading}
-              className={`px-12 py-4 rounded-full font-bold text-lg flex items-center gap-3 shadow-2xl transition-all transform hover:scale-105 active:scale-95 ${
-                !prompt.trim() || isLoading
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                  : 'bg-white text-slate-950 hover:bg-indigo-50 shadow-indigo-500/20'
-              }`}
-            >
-              {isLoading ? <Loader2 className="animate-spin w-5 h-5" /> : <Wand2 className="w-5 h-5" />}
-              {isLoading ? 'Generating...' : 'Generate Thumbnail'}
-            </button>
+            <SignedIn>
+              <button
+                onClick={handleGenerate}
+                disabled={!prompt.trim() || isLoading}
+                className={`px-12 py-4 rounded-full font-bold text-lg flex items-center gap-3 shadow-2xl transition-all transform hover:scale-105 active:scale-95 ${
+                  !prompt.trim() || isLoading
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                    : 'bg-white text-slate-950 hover:bg-indigo-50 shadow-indigo-500/20'
+                }`}
+              >
+                {isLoading ? <Loader2 className="animate-spin w-5 h-5" /> : <Wand2 className="w-5 h-5" />}
+                {isLoading ? 'Generating...' : 'Generate Thumbnail'}
+              </button>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="px-12 py-4 rounded-full font-bold text-lg flex items-center gap-3 shadow-2xl transition-all transform hover:scale-105 active:scale-95 bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-500">
+                  <Wand2 className="w-5 h-5" />
+                  Sign In to Generate
+                </button>
+              </SignInButton>
+            </SignedOut>
           </div>
 
           {/* Mobile Generate Button (Sticky Bottom) */}
           <div className="md:hidden sticky bottom-0 left-0 right-0 bg-slate-950 p-4 border-t border-slate-800">
-            <button
-              onClick={handleGenerate}
-              disabled={!prompt.trim() || isLoading}
-              className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
-                !prompt.trim() || isLoading
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                  : 'bg-white text-slate-950 hover:bg-indigo-50'
-              }`}
-            >
-              {isLoading ? <Loader2 className="animate-spin w-5 h-5" /> : <Wand2 className="w-5 h-5" />}
-              {isLoading ? 'Dreaming...' : 'Generate Thumbnail'}
-            </button>
+            <SignedIn>
+              <button
+                onClick={handleGenerate}
+                disabled={!prompt.trim() || isLoading}
+                className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+                  !prompt.trim() || isLoading
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                    : 'bg-white text-slate-950 hover:bg-indigo-50'
+                }`}
+              >
+                {isLoading ? <Loader2 className="animate-spin w-5 h-5" /> : <Wand2 className="w-5 h-5" />}
+                {isLoading ? 'Dreaming...' : 'Generate Thumbnail'}
+              </button>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                  <Wand2 className="w-5 h-5" />
+                  Sign In to Generate
+                </button>
+              </SignInButton>
+            </SignedOut>
           </div>
         </div>
       </div>
